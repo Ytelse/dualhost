@@ -58,13 +58,14 @@ void* mcu_runloop(void* pdata_void_ptr) {
 	flbl2 = fopen(TEST_LBL_FP, "rb");
 	fseek(flbl1, 8, SEEK_SET);
 	fseek(flbl2, 8, SEEK_SET);
-	int img = 0; 
-	while (!feof(flbl1)) {
-		mnist_lbl[img++] = getc(flbl1);
+	int img = 0;
+	int c = 0;
+	while ((c = fgetc(flbl1)) != EOF) {
+		mnist_lbl[img++] = (unsigned char) c;
 	}
 	fprintf(flog, "  -- Read %d bytes from training label set.\n", img);
-	while (!feof(flbl2)) {
-		mnist_lbl[img++] = getc(flbl2);
+	while ((c = fgetc(flbl2)) != EOF) {
+		mnist_lbl[img++] = (unsigned char) c;
 	}
 	fprintf(flog, "  -- Read %d bytes from MNIST label set.\n", img);
 	gettimeofday(&end, NULL);
@@ -91,7 +92,7 @@ void* mcu_runloop(void* pdata_void_ptr) {
 		gettimeofday(&end, NULL);
 		ms = ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
 		s = ms/1e6;
-		fprintf(stdout, "\rSent: \x1b[32m%.3f\x1b[0m MB, received: \x1b[32m%.3f\x1b[0m, duration: \x1b[32m%.3f\x1b[0m, HOST->FPGA: \x1b[32m%.3f\x1b[0m Mbps, MCU->HOST: \x1b[32m%.3f\x1b[0m Mbps", ((double)tot_xferred/1e6), ((double)tot_recvd/1e6),  s, (double)((tot_xferred*8.0f/1e6)/s), (double)(tot_recvd*8.0f/1e6)/s);
+		fprintf(stdout, "\rSent: \x1b[32m%.2f\x1b[0m MB | Recv: \x1b[32m%.2f\x1b[0m MB | Elapsed: \x1b[32m%.3f\x1b[0m s | Up: \x1b[32m%.3f\x1b[0m Mbps | Down: \x1b[32m%.3f\x1b[0m Mbps", ((double)tot_xferred/1e6), ((double)tot_recvd/1e6),  s, (double)((tot_xferred*8.0f/1e6)/s), (double)(tot_recvd*8.0f/1e6)/s);
 		fflush(stdout);
 
 		if (s >= TEST_DURATION) {

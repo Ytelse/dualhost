@@ -20,7 +20,7 @@ extern long long tot_xferred;
 #define NOF_IMG 			70000
 #define IMG_SIZE 			98
 
-#define IMG_PR_TRANSFER 	10000
+#define IMG_PR_TRANSFER 	350
 #define TRANSFER_TIMEOUT 	1000
 
 #define TEST_DURATION 		15.0f
@@ -52,10 +52,11 @@ void* fpga_runloop(void* pdata_void_ptr) {
 
 	gettimeofday(&start, NULL);
 	long long idx = 0;
-	while(!feof(fmnist)) {
-		mnist[idx++] = getc(fmnist);
+	int c = 0;
+	while((c = getc(fmnist)) != EOF) {
+		mnist[idx++] = (unsigned char) c;
 		if ((idx % (700 * IMG_SIZE)) == 0) {
-			fprintf(stdout, "\rReading MNIST -- %2d%%", (int) ((idx / 98)  / (NOF_IMG/100)));
+			fprintf(stdout, "\rReading MNIST...                                    %2d%%", (int) ((idx / 98)  / (NOF_IMG/100)));
 			fflush(stdout);
 		}
 	}
@@ -63,7 +64,7 @@ void* fpga_runloop(void* pdata_void_ptr) {
 	ms = ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
 	s = ms/1e6;
 
-	fprintf(stdout, "\rReading MNIST -- "_GREEN"DONE!\n"_RESET);
+	fprintf(stdout, "\rReading MNIST...                                    "_GREEN"DONE!\n"_RESET);
 
 	/* ======== OUTPUT DBG INFO ======== */
 	fprintf(flog, "   -- Read %llu bytes (%.3f MB) in %.3f seconds.\n", idx, (double)idx/1e6, s);
@@ -72,10 +73,12 @@ void* fpga_runloop(void* pdata_void_ptr) {
 	barrier_wait(&barrier);
 	tot_xferred = 0;
 	int iter = 0;
+	int cnt = 0;
 	gettimeofday(&start, NULL);
 	while (1) {
 		int xferred;
 		libusb_bulk_transfer(usb_data->dev_handle, FPGA_EP_OUT, &mnist[iter * IMG_SIZE * IMG_PR_TRANSFER], IMG_SIZE*IMG_PR_TRANSFER, &xferred, TRANSFER_TIMEOUT);
+		cnt++;
 		tot_xferred += xferred;
 		gettimeofday(&end, NULL);
 		ms = ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec));
@@ -90,6 +93,7 @@ void* fpga_runloop(void* pdata_void_ptr) {
 	fprintf(flog, "\n");
 	fprintf(flog, "========================================================\n");
 	fprintf(flog, "-- Duration:                            %.3f\n", s);
+	fprintf(flog, "-- Number of transfers:                 %d\n", cnt);
 	fprintf(flog, "-- Data transferred:                    %llu B\n", tot_xferred);
 	fprintf(flog, "-- Avg. transfer speed:                 %.3f Mbps\n", (tot_xferred*8.0f/1e6)/s);
 	fprintf(flog, "========================================================\n");

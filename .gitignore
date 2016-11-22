@@ -38,3 +38,4 @@ build/
 pacman
 *.log
 mcu_out
+data/ubyte_bit_conv

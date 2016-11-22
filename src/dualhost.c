@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
 
 	/* ========== INITIALIZE LIBUSB ========== */
 
-	fprintf(stdout, "Initializing libusb... ");
+	fprintf(stdout, "Initializing libusb...                              ");
 	libusb_context* context = NULL;
 	if (libusb_init(&context)) {
 		fprintf(stdout, _RED"FAILED!\n"_RESET);
@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
 				fprintf(stdout, _RED"ERROR: Failed to connect to FPGA!\n"_RESET);
 				return EXIT_FAILURE;
 			}
-
+			connected = true;
 			goto _mainloop;
 		} else if (cmd == START && !_keepalive && connected) {
 			barrier_init(&barrier, 3);
@@ -82,25 +82,25 @@ int main(int argc, char **argv) {
 			fpga_data.dev_handle = fpga;
 			fpga_data.interface = 1;
 			/* Start threads */
-			fprintf(stdout, "Creating FPGA thread... ");
+			fprintf(stdout, "Creating FPGA thread...                             ");
 			if (pthread_create(&fpga_thread, NULL, fpga_runloop, (void*)&fpga_data)) {
 				fprintf(stdout, _RED"FAILED!\n"_RESET);
 				return EXIT_FAILURE;
 			}
 			fprintf(stdout, _GREEN"DONE!\n"_RESET);
-			fprintf(stdout, "Creating MCU thread... ");
+			fprintf(stdout, "Creating MCU thread...                              ");
 			if (pthread_create(&mcu_thread, NULL, mcu_runloop, (void*)&mcu_data)) {
 				fprintf(stdout, _RED"FAILED!\n"_RESET);
 				return EXIT_FAILURE;
 			}
 			fprintf(stdout, _GREEN"DONE!\n"_RESET);
 			barrier_wait(&barrier);
-			fprintf(stdout, "Syncing threads... "_GREEN"DONE!\n"_RESET);
+			fprintf(stdout, "Syncing threads...                                  "_GREEN"DONE!\n"_RESET);
 			fflush(stdout);
 			goto _mainloop;
 		} else if (cmd == STOP && _keepalive && connected) {
 			_keepalive = false;
-			fprintf(stdout, "Joining threads... ");
+			fprintf(stdout, "Joining threads...                                  ");
 			pthread_join(fpga_thread, NULL);
 			pthread_join(mcu_thread, NULL);
 			fprintf(stdout, _GREEN"DONE!\n"_RESET);
