@@ -3,6 +3,7 @@ Simplified USB host program connecting to both FPGA and MCU
 
 ## Compiling
 In order to compile this program the Makefile needs to be edited with the proper location of libusb-1.0. If this is installed on MacOS with homebrew, no changes are necessary. Edit LIBUSB_PATH to point to the root directory of the most current installed version of libusb. Example: `LIBUSB_PATH:=/.../libusb/<version>`
+If compiling on a system that does not have `afplay`, the line `CFLAGS+=-DPLAY_SOUND` should be commented out.
 
 ## Running
 Can be executed either by `make run` or `./pacman`. Takes no command-line arguments. Type 'help' for a list of commands.

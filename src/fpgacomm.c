@@ -16,14 +16,15 @@
 extern barrier_t barrier;
 extern long long tot_xferred;
 
-#define MNIST_FP 			"data/bit_mnist_images"
+#define MNIST_FP 			"data/mnist.bytes"
+
 #define NOF_IMG 			70000
 #define IMG_SIZE 			98
 
 #define IMG_PR_TRANSFER 	350
 #define TRANSFER_TIMEOUT 	1000
 
-#define TEST_DURATION 		15.0f
+#define TEST_DURATION 		5.0f
 #define DBG_OUTPUT_FP		"fpga_debug.log"
 
 static unsigned char mnist[NOF_IMG*IMG_SIZE];
