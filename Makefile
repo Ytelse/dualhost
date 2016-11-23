@@ -35,6 +35,10 @@ LIBS:=-L$(LIBUSB_PATH)/lib
 CFLAGS:=-std=c99 -Wall $(INCLUDES) -O2 -DNDEBUG
 LDFLAGS:=$(LIBS) -lusb-1.0 -lpthread
 
+# UNCOMMENT FOLLOWING LINE FOR SOUND TO PLAY AT BEGINNING OF PROGRAM
+
+CFLAGS+=-DPLAY_SOUND
+
 ################
 # FILES
 ################

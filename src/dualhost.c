@@ -29,6 +29,10 @@ int main(int argc, char **argv) {
 	UNUSED(argv);
 
 	print_startup_msg();
+	
+	#ifdef PLAY_SOUND
+	system("afplay data/pacman_beginning.wav");
+	#endif
 
 	/* ========== INITIALIZE LIBUSB ========== */
 
